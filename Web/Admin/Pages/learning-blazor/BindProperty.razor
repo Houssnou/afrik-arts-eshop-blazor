@@ -1,0 +1,30 @@
+﻿@page "/learning-blazor/bindProperty"
+@using Admin.Data.learning_blazor
+
+<h3>Product</h3>
+Name: @product.Name
+<br />
+Availability: @(product.IsAvailable ? "Available" : "Not available")
+<br />
+Availability:
+<input type="checkbox" @bind-value="@product.IsAvailable" checked="@(product.IsAvailable? "checked": null)" />
+<br />
+Price: @product.Price
+<br />
+Price- bind value:
+<input type="number" @bind-value="@product.Price" @bind-value:event="oninput" />
+<br />
+Price- bind:
+<input type="number" @bind="@product.Price" @bind:event="oninput" />
+
+@code {
+
+    DemoProductDto product = new()
+        {
+            Id = 1,
+            IsAvailable = true,
+            Name = "Mossi Mask",
+            Price = 10.99
+        };
+
+}
