@@ -1,11 +1,15 @@
-﻿
-<div class="d-flex justify-content-between align-items-center">
-    <div class="btn-group">
-        <button type="button" class="btn btn-sm btn-outline-danger">Delete</button>
-        <button type="button" class="btn btn-sm btn-outline-warning">Edit</button>
+﻿@if (IsAvailable)
+{
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-outline-danger">Delete</button>
+            <button type="button" class="btn btn-sm btn-outline-warning">Edit</button>
+        </div>
     </div>
-</div>
+}
+
 
 @code {
-
+    [Parameter]
+    public bool IsAvailable { get; set; }
 }

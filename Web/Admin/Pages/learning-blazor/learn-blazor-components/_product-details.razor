@@ -1,0 +1,44 @@
+﻿@using Admin.Data.learning_blazor
+<div class="col">
+    <div class="card shadow-sm" @onclick="(args)=>ProductSelected(args, Product)">
+        @* <img class="card-img-top" src="http://www.w3.org/2000/svg" alt="product image coming soon">*@
+        <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+        <div class="card-body">
+            <h5 class="card-title">@Product.Name</h5>
+            <p class="card-text">$@Product.Price</p>
+            <p class="card-text">Show details: <input type="checkbox" @bind-value="Product.IsAvailable" checked="@(Product.IsAvailable ? "checked" : null)" /></p>
+
+            @if (Product.IsAvailable)
+            {
+                @foreach (var d in Product.Details)
+                {
+                    <p class="card-text ms-2">@d.Key: @d.Value</p>
+                }
+            }
+            <_product_actions IsAvailable="Product.IsAvailable"> </_product_actions>
+            <input type="checkbox" class="lead" @onchange="CartUpdate" /> Add to cart<br />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public DemoProductDto Product { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> onCartUpdate { get; set; }
+
+    [Parameter]
+    public EventCallback<DemoProductDto> onProductSelect { get; set; }
+
+    private async Task CartUpdate(ChangeEventArgs e)
+    {
+        await onCartUpdate.InvokeAsync((bool)e.Value);
+    }
+
+    private async Task ProductSelected(MouseEventArgs e, DemoProductDto item)
+    {
+        await onProductSelect.InvokeAsync(item);
+    }
+
+}
