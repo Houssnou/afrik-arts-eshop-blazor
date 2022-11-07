@@ -19,11 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "API\Infra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin", "Web\Admin\Admin.csproj", "{DAADC30C-D3BD-499E-9476-7B551B326925}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Web\Client\Client.csproj", "{6ED645F0-1773-4E10-8D4F-C20B9F5B1166}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Web\Client\Client.csproj", "{6ED645F0-1773-4E10-8D4F-C20B9F5B1166}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{0CA9A4AB-4349-401C-93F1-3C36D88AAFD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Contract", "Data.Contract\Data.Contract.csproj", "{68C0030F-8333-4A9F-86DB-68AC7045A263}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data.Contract", "Data.Contract\Data.Contract.csproj", "{68C0030F-8333-4A9F-86DB-68AC7045A263}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

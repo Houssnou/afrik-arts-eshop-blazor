@@ -1,30 +1,178 @@
 ﻿@page "/learning-blazor/bindProperty"
 @using Admin.Data.learning_blazor
+<div class="row">
+    <div class="col-6 border p-3">
+        <h3>Product Summary</h3>
+        <hr />
+        Name: @product.Name
+        <br />
+        Availability: @(product.IsAvailable ? "Available" : "Not available")
+        <br />
+        Availability:
+        <input type="checkbox" @bind-value="product.IsAvailable" checked="@(product.IsAvailable? "checked": null)" />
+        <br />
+        Price: @product.Price
+        <br />
+        @*Price- bind value:
+        <input type="number" @bind-value="product.Price" @bind-value:event="oninput" />
+        <br />
+        Price- bind:
+        <input type="number" class="m-2" @bind="product.Price" @bind:event="oninput" />
+        <br />*@
+    </div>
 
-<h3>Product</h3>
-Name: @product.Name
-<br />
-Availability: @(product.IsAvailable ? "Available" : "Not available")
-<br />
-Availability:
-<input type="checkbox" @bind-value="@product.IsAvailable" checked="@(product.IsAvailable? "checked": null)" />
-<br />
-Price: @product.Price
-<br />
-Price- bind value:
-<input type="number" @bind-value="@product.Price" @bind-value:event="oninput" />
-<br />
-Price- bind:
-<input type="number" @bind="@product.Price" @bind:event="oninput" />
 
+    <div class="col-6 border p-3">
+        <h3>Product Edit</h3>
+        <hr />
+        Product Details:
+        <select @bind="selectedProp">
+            @foreach (var d in product.Details)
+            {
+                <option value="@d.Key">@d.Value</option>
+            }
+        </select>
+        <br />
+        Product Details: @selectedProp
+        <br />
+        @if (!string.IsNullOrEmpty(selectedProp))
+        {
+            <p> Property Value: @product.Details.FirstOrDefault(d=>d.Key == selectedProp)?.Value</p>
+        }
+    </div>
+</div>
+<div>
+    <h3> Product List</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Availability</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in ProductDtos)
+            {
+                <tr>
+                    <th scope="row">@p.Id</th>
+                    <td> <input type="text" @bind-value="p.Name" @bind-value:event="oninput" /></td>
+                    <td> <input type="number" @bind-value="p.Price" @bind-value:event="oninput" /></td>
+                    <td><input type="checkbox" @bind-value="p.IsAvailable" checked="@(p.IsAvailable? "checked": null)" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <h3> Products Summary</h3>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Availability</th>
+                <th scope="col">Origin</th>
+                <th scope="col">Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in ProductDtos)
+            {
+                <tr>
+                    <th scope="row">@p.Id</th>
+                    <td>@p.Name</td>
+                    <td>@p.Price</td>
+                    <td>@(p.IsAvailable ? "Available" : "Not available")</td>
+                    <td>@p.Details.FirstOrDefault(d=>d.Key =="Type")?.Value</td>
+                    <td>@p.Details.FirstOrDefault(d=>d.Key =="Origin")?.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 @code {
+
+    private string selectedProp = "";
 
     DemoProductDto product = new()
         {
             Id = 1,
             IsAvailable = true,
             Name = "Mossi Mask",
-            Price = 10.99
+            Price = 10.99,
+            Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Mask"},
+                new() { Id = 1, Key = "Origin", Value = "Burkina Faso"},
+                new() { Id = 1, Key = "Period", Value = "Naaba Lion Epoque"},
+                new() { Id = 1, Key = "Weight", Value = "2.5Kg"}
+            }
         };
+
+    public List<DemoProductDto> ProductDtos = new();
+
+    protected override void OnInitialized()
+    {
+        ProductDtos.Add(new()
+            {
+                Id = 1,
+                IsAvailable = true,
+                Name = "Female Figure",
+                Price = 10.99,
+                Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Figure"},
+                new() { Id = 1, Key = "Origin", Value = "Burkina Faso"},
+                new() { Id = 1, Key = "Period", Value = "Naaba Lion Epoque"},
+                new() { Id = 1, Key = "Weight", Value = "2.5Kg"}
+            }
+            });
+        ProductDtos.Add(new()
+            {
+                Id = 2,
+                IsAvailable = false,
+                Name = "Male Figure",
+                Price = 12.99,
+                Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Figure"},
+                new() { Id = 1, Key = "Origin", Value = "Burkina Faso"},
+                new() { Id = 1, Key = "Period", Value = "Naaba Lion Epoque"},
+                new() { Id = 1, Key = "Weight", Value = "2.5Kg"}
+            }
+            });
+        ProductDtos.Add(new()
+            {
+                Id = 1,
+                IsAvailable = true,
+                Name = "Antelope Mask",
+                Price = 90.99,
+                Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Mask"},
+                new() { Id = 1, Key = "Origin", Value = "Ghana"},
+                new() { Id = 1, Key = "Period", Value = "Jollof Rice Era"},
+                new() { Id = 1, Key = "Weight", Value = "12.5Kg"}
+            }
+            });
+        ProductDtos.Add(new()
+            {
+                Id = 1,
+                IsAvailable = false,
+                Name = "Rain Maker Mask",
+                Price = 100.99,
+                Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Mask"},
+                new() { Id = 1, Key = "Origin", Value = "Benin"},
+                new() { Id = 1, Key = "Period", Value = "Jollof Rice Era"},
+                new() { Id = 1, Key = "Weight", Value = "112.5Kg"}
+            }
+            });
+    }
 
 }

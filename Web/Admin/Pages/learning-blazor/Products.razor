@@ -1,0 +1,103 @@
+﻿@page "/learning-blazor/products"
+@using Admin.Data.learning_blazor
+@using Admin.Pages.learning_blazor.learn_blazor_components
+
+<h3>Products</h3>
+
+<div class="container">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        @foreach (var item in products)
+        {
+            <div class="col">
+                <div class="card shadow-sm">
+                    @* <img class="card-img-top" src="http://www.w3.org/2000/svg" alt="product image coming soon">*@
+                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Name</h5>
+                        <p class="card-text">$@item.Price</p>
+                        <p class="card-text">Show details: <input type="checkbox" @bind-value="item.IsAvailable" checked="@(item.IsAvailable ? "checked" : null)" /></p>
+
+                        @if(item.IsAvailable){
+                            @foreach (var d in item.Details)
+                            {
+                                <p class="card-text ms-2">@d.Key: @d.Value</p>
+                            }
+                        }
+
+                        @*<div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button type="button" class="btn btn-sm btn-outline-warning">Edit</button>
+                            </div>
+                        </div>*@
+                        <_product_actions> </_product_actions>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    public List<DemoProductDto> products = new();
+
+    protected override void OnInitialized()
+    {
+        products.Add(new()
+            {
+                Id = 1,
+                IsAvailable = true,
+                Name = "Female Figure",
+                Price = 10.99,
+                Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Figure"},
+                new() { Id = 1, Key = "Origin", Value = "Burkina Faso"},
+                new() { Id = 1, Key = "Period", Value = "Naaba Lion Epoque"},
+                new() { Id = 1, Key = "Weight", Value = "2.5Kg"}
+            }
+            });
+        products.Add(new()
+            {
+                Id = 2,
+                IsAvailable = false,
+                Name = "Male Figure",
+                Price = 12.99,
+                Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Figure"},
+                new() { Id = 1, Key = "Origin", Value = "Burkina Faso"},
+                new() { Id = 1, Key = "Period", Value = "Naaba Lion Epoque"},
+                new() { Id = 1, Key = "Weight", Value = "2.5Kg"}
+            }
+            });
+        products.Add(new()
+            {
+                Id = 1,
+                IsAvailable = true,
+                Name = "Antelope Mask",
+                Price = 90.99,
+                Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Mask"},
+                new() { Id = 1, Key = "Origin", Value = "Ghana"},
+                new() { Id = 1, Key = "Period", Value = "Jollof Rice Era"},
+                new() { Id = 1, Key = "Weight", Value = "12.5Kg"}
+            }
+            });
+        products.Add(new()
+            {
+                Id = 1,
+                IsAvailable = false,
+                Name = "Rain Maker Mask",
+                Price = 100.99,
+                Details = new List<DemoProductDetails>()
+            {
+                new() { Id = 1, Key = "Type", Value = "Mask"},
+                new() { Id = 1, Key = "Origin", Value = "Benin"},
+                new() { Id = 1, Key = "Period", Value = "Jollof Rice Era"},
+                new() { Id = 1, Key = "Weight", Value = "112.5Kg"}
+            }
+            });
+    }
+}
