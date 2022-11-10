@@ -15,6 +15,10 @@
                     <p class="card-text ms-2">@d.Key: @d.Value</p>
                 }
             }
+            @if (@ChildContentOne != null && @ChildContentTwo != null)
+            {
+                <p class="card-text">Render Frames from Product List: @ChildContentOne @ChildContentTwo</p>
+            }
             <_product_actions IsAvailable="Product.IsAvailable"> </_product_actions>
             <input type="checkbox" class="lead" @onchange="CartUpdate" /> Add to cart<br />
         </div>
@@ -30,6 +34,11 @@
 
     [Parameter]
     public EventCallback<DemoProductDto> onProductSelect { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContentOne { get; set; }
+    [Parameter]
+    public RenderFragment ChildContentTwo { get; set; }
 
     private async Task CartUpdate(ChangeEventArgs e)
     {

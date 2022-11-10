@@ -1,0 +1,47 @@
+﻿@page "/learning-blazor/Routing/{parameter1}/{parameter2}" 
+@page "/learning-blazor/Routing"
+
+@*very weird error: typo in route => /learning-blazor/Routing/{parameter1}/{parameter2}s" 
+s was compelty prevent the app to laod give a misleading routing 
+Microsoft.AspNetCore.Components.Routing.Router.Refresh(Boolean isNavigationIntercepted) 
+at Microsoft.AspNetCore.Components.Routing.Router."*@
+
+@inject NavigationManager _NavigationManager
+
+<h3>Routing</h3>
+
+<h4> Params: @Parameter1 - @Parameter2</h4>
+
+<a href="learning-blazor/Routing?name=eshop&owner=zamba" class="btn btn-primary"> Query params</a>
+
+<button class="btn btn-success" @onclick="GetParams">Get query params</button>
+<br />
+
+<div class="container pl-0">
+    <h4> Query params data:  </h4>
+    <ul class="list-group">
+        <li class="list-group-item small">Name: @Name</li>
+        <li class="list-group-item">Owner: @Owner</li>
+    </ul>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Parameter1 { get; set; }
+
+    [Parameter]
+    public string Parameter2 { get; set; }
+
+    public string Name { get; set; }
+    public string Owner { get; set; }
+
+    private void GetParams()
+    {
+        var absoluteUri = new Uri(_NavigationManager.Uri);
+        var queryParams = System.Web.HttpUtility.ParseQueryString(absoluteUri.Query);
+
+        Name = queryParams["name"];
+        Owner = queryParams["owner"];
+    }
+}

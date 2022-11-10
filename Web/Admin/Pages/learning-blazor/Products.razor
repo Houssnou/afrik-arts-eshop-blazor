@@ -12,7 +12,10 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
         @foreach (var item in products)
         {
-            <_product_details Product="@item" onCartUpdate="CartUpdate" onProductSelect="ProductSelect"></_product_details>
+            <_product_details Product="@item" onCartUpdate="CartUpdate" onProductSelect="ProductSelect">
+                <ChildContentOne> #1</ChildContentOne>
+                <ChildContentTwo> #2</ChildContentTwo>
+            </_product_details>
         }
     </div>
 </div>

@@ -1,0 +1,36 @@
+﻿@page "/learning-blazor/ParentComponent"
+<h3>Parent Child Components</h3>
+
+<CascadingValue Value="@MessageForGrandChild" Name="MessageForGrandChild">
+    <CascadingValue Value="@LuckyNumber" Name="LuckyNumber">
+        <_childComponent OnBtnClick="ShowMessage" Title="This is a parameter passed from parent">
+            <ChildContent> Content from parent </ChildContent>
+            <AnotherChildContent> Another Content from parent </AnotherChildContent>
+        </_childComponent>
+    </CascadingValue>
+</CascadingValue>
+<p><b>@message</b></p>
+@*<_anotherChildComponent Placeholder="name must be entered" MaxLength="10"></_anotherChildComponent>*@
+@*<_anotherChildComponent Attributes="AttributesFromParent"></_anotherChildComponent>*@
+<_anotherChildComponent Placeholder="name must be entered"></_anotherChildComponent>
+@*<_childComponent Title="This is a second param passed from parent">
+   Content from second param parent</ChildContent>
+</_childComponent>*@
+
+@code {
+
+    //public Dictionary<string, object> AttributesFromParent { get; set; } = new()
+    //{
+    //    { "required", "required" },
+    //    { "placeholder", "Initial Text" },
+    //    { "maxlength", 10 }
+    //};
+    public string LuckyNumber = "7";
+    public string MessageForGrandChild = "this is a message from your grand parent";
+    public string message = "";
+
+    private void ShowMessage()
+    {
+        message = "Awesome.";
+    }
+}
