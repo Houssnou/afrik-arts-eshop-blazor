@@ -1,0 +1,51 @@
+﻿@page "/product-types"
+@using Admin.Data.ProductType
+@using Admin.Services
+@inject ApiService _ApiService
+
+<h3>Product Types</h3>
+
+<div class="container ms-0">
+
+    <a href="product-types/create" class="btn btn-outline-primary float-end">New Type</a>
+
+    @if (types == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pt in types)
+                {
+                    <tr>
+                        <td>@pt.Id</td>
+                        <td>@pt.Name</td>
+                        <td>
+                            <a href="product-types/edit" class="btn btn-outline-warning"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <a href="product-types/delete" class="btn btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private IList<ProductType>? types;
+
+    protected override async Task OnInitializedAsync()
+    {
+        types = await _ApiService.GetAllProductTypes();
+    }
+
+}

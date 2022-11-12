@@ -16,7 +16,7 @@ namespace API.Helpers
             .ForMember(d => d.PictureUrl, o => o.MapFrom<ProductUrlResolver>());
 
             CreateMap<ProductOrigin, OriginForReturnDto>();
-            CreateMap<ProductType, ProductToReturnDto>();
+            CreateMap<ProductType, TypeForReturnDto>();
 
             CreateMap<ProductDto, Product>();
             CreateMap<OriginDto, ProductOrigin>().ReverseMap();
