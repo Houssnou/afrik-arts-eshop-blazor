@@ -1,0 +1,84 @@
+﻿@page "/learning-blazor/lifecycle"
+<h3>Life Cycle</h3>
+@using System.Threading
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<br />
+@Count <button class="btn btn-primary" @onclick="StartCountDown">Start Countdown</button>
+<div class="border">
+    <_lifeCycleComponent Count="@currentCount"></_lifeCycleComponent>
+</div>
+
+<hr />
+@foreach (var item in EventTypes)
+{
+    @item
+    <hr />
+}
+
+@code {
+    private int currentCount = 0;
+
+    List<string> EventTypes = new List<string>();
+    private int Count { get; set; } = 5;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    protected override void OnInitialized()
+    {
+        EventTypes.Add("OnInitialized is called");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        EventTypes.Add("OnInitializedAsync is called");
+        await Task.Delay(1000);
+    }
+
+    protected override void OnParametersSet()
+    {
+        EventTypes.Add("OnParametersSet is called");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        EventTypes.Add("OnParametersSetAsync is called");
+        await Task.Delay(1000);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        EventTypes.Add("OnAfterRender is called");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        EventTypes.Add("OnAfterRenderAsync is called");
+    }
+
+    protected override bool ShouldRender()
+    {
+        EventTypes.Add("ShouldRender is called");
+        return true;
+    }
+
+    void StartCountDown()
+    {
+        var timer = new Timer(TimeCallback, null, 1000, 1000);
+    }
+
+    private void TimeCallback(object? state)
+    {
+        if (Count > 0)
+        {
+            Count--;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+}

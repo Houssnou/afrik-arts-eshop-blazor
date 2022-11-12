@@ -1,4 +1,4 @@
-﻿@page "/learning-blazor/Routing/{parameter1}/{parameter2}" 
+﻿@page "/learning-blazor/Routing/{parameter1:int}/{parameter2}" 
 @page "/learning-blazor/Routing"
 
 @*very weird error: typo in route => /learning-blazor/Routing/{parameter1}/{parameter2}s" 
@@ -12,7 +12,9 @@ at Microsoft.AspNetCore.Components.Routing.Router."*@
 
 <h4> Params: @Parameter1 - @Parameter2</h4>
 
-<a href="learning-blazor/Routing?name=eshop&owner=zamba" class="btn btn-primary"> Query params</a>
+@*<a href="learning-blazor/Routing?name=eshop&owner=zamba" class="btn btn-primary"> Query params</a>*@
+@*<NavLink href="learning-blazor/Routing?name=eshop&owner=zamba" class="btn btn-primary"> Query params</NavLink>*@
+<button @onclick="NagivateToQueryParams" class="btn btn-primary"> Query params</button>
 
 <button class="btn btn-success" @onclick="GetParams">Get query params</button>
 <br />
@@ -28,7 +30,7 @@ at Microsoft.AspNetCore.Components.Routing.Router."*@
 @code {
 
     [Parameter]
-    public string Parameter1 { get; set; }
+    public int Parameter1 { get; set; }
 
     [Parameter]
     public string Parameter2 { get; set; }
@@ -44,4 +46,10 @@ at Microsoft.AspNetCore.Components.Routing.Router."*@
         Name = queryParams["name"];
         Owner = queryParams["owner"];
     }
+
+    private void NagivateToQueryParams()
+    {
+        _NavigationManager.NavigateTo("learning-blazor/Routing?name=eshop&owner=zamba");
+    }
+
 }

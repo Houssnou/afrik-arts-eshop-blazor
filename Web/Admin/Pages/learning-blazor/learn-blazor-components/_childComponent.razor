@@ -1,4 +1,4 @@
-﻿
+﻿@inject IJSRuntime _JsRuntime
 <div>
     <div class="alert alert-info">@Title</div>
     <div class="alert alert-success">
@@ -30,4 +30,9 @@
     public RenderFragment AnotherChildContent { get; set; }
     [Parameter]
     public EventCallback OnBtnClick { get; set; }
+
+    public async Task ToastrSuccess()
+    {
+        await _JsRuntime.ToastrSuccess("Success");
+    }
 }

@@ -17,19 +17,13 @@ namespace API.Controllers
 {
     public class ProductsController : BaseApiController
     {
-        private readonly IBaseRepository<Product> _productsRepo;
-        private readonly IBaseRepository<ProductOrigin> _productBrandRepo;
-        private readonly IBaseRepository<ProductType> _productTypeRepo;
+        private readonly IProductService _productService;
         private readonly IMapper _mapper;
 
-        public ProductsController(IBaseRepository<Product> productsRepo,
-                                    IBaseRepository<ProductOrigin> productBrandRepo,
-                                    IBaseRepository<ProductType> productTypeRepo, IMapper mapper)
+        public ProductsController(IProductService productService, IMapper mapper)
         {
+            _productService = productService;
             _mapper = mapper;
-            _productsRepo = productsRepo;
-            _productBrandRepo = productBrandRepo;
-            _productTypeRepo = productTypeRepo;
         }
 
         [Cached(600)]
@@ -37,13 +31,10 @@ namespace API.Controllers
         public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts(
             [FromQuery] ProductSpecParams productParams)
         {
-            var productSpec = new ProductsWithTypesAndOriginsSpecification(productParams);
 
-            var countSpec = new ProductsWithFiltersForCountSpecification(productParams);
+            var totalItems = await _productService.CountProductsAsync(productParams);
 
-            var totalItems = await _productsRepo.CountAsync(countSpec);
-
-            var products = await _productsRepo.ListAsync(productSpec);
+            var products = await _productService.GetProductsAsync(productParams);
 
             var data = _mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products);
 
@@ -56,25 +47,51 @@ namespace API.Controllers
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductToReturnDto>> GetProduct(int id)
         {
-            var spec = new ProductsWithTypesAndOriginsSpecification(id);
-
-            var product = await _productsRepo.GetEntityWithSpec(spec);
+            var product = await _productService.GetProductAsyncById(id);
 
             if (product == null) return NotFound(new ApiResponse(404));
 
-            return _mapper.Map<Product, ProductToReturnDto>(product);
+            return Ok(_mapper.Map<Product, ProductToReturnDto>(product));
         }
         [Cached(600)]
         [HttpGet("origins")]
         public async Task<ActionResult<List<ProductOrigin>>> GetOrigins()
         {
-            return Ok(await _productBrandRepo.GetListAsync());
+            return Ok(_mapper.Map<IReadOnlyList<OriginForReturnDto>>(await _productService.GetProductOriginsAsync()));
         }
         [Cached(600)]
         [HttpGet("types")]
         public async Task<ActionResult<List<ProductType>>> GetTypes()
         {
-            return Ok(await _productTypeRepo.GetListAsync());
+            return Ok(_mapper.Map<IReadOnlyList<TypeForReturnDto>>(await _productService.GetProductTypesAsync()));
+        }
+
+        [HttpPost("types")]
+        public async Task<ActionResult<TypeForReturnDto>> AddNewType(TypeDto typeDto)
+        {
+            return Ok();
+        }
+        [HttpPost("origins")]
+        public async Task<ActionResult<OriginForReturnDto>> AddNewOrigin(OriginDto originDto)
+        {
+            return Ok();
+        }
+        [HttpPost]
+        public async Task<ActionResult<ProductToReturnDto>> AddNewProduct()
+        {
+            return Ok();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductToReturnDto>> UpdateProduct(int id, [FromBody] ProductDto productDto)
+        {
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteProduct(int id)
+        {
+            return Ok();
         }
     }
 }
