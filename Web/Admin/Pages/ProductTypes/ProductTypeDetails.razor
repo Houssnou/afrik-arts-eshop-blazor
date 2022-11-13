@@ -1,0 +1,46 @@
+﻿@page "/product-types/create"
+@inject NavigationManager _NavigationManager
+@inject IJSRuntime _JsRuntime
+@inject ApiService _ApiService
+
+<div class="row my-2">
+    <h3 class="card-title text-primary mb-3 ml-3">@Title Product Type</h3>
+    <div class="col-4">
+        <EditForm Model="productType" OnValidSubmit="SaveChanges">
+            <DataAnnotationsValidator />
+            @*<ValidationSummary />*@
+            <div class="mb-3">
+                <label for="name" class="form-label">Type Name</label>
+                <InputText @bind-Value="productType.Name" class="form-control"></InputText>
+                <ValidationMessage For="()=>productType.Name"></ValidationMessage>
+            </div>
+
+            <div class="d-grid gap-2 d-md-block float-end">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <NavLink href="product-types" class="btn btn-danger">Cancel</NavLink>
+            </div>
+        </EditForm>
+    </div>
+
+</div>
+@code {
+    private ProductType productType { get; set; } = new ProductType();
+
+    public string Title { get; set; } = "New";
+
+    private async Task SaveChanges()
+    {
+        var product = await _ApiService.CreateNewProductType(productType);
+
+        if (product == null)
+        {
+            await _JsRuntime.ToastrError($"Error while saving your new product type: {productType.Name}");
+        }
+        else
+        {
+            await _JsRuntime.ToastrSuccess($"{productType.Name} successfully saved!");
+            _NavigationManager.NavigateTo("/product-types");
+        }
+    }
+
+}

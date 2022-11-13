@@ -8,6 +8,7 @@ using Core.Entities;
 using Core.Specifications;
 using Stripe;
 using Product = Core.Entities.Product;
+using FluentResults;
 
 namespace Infrastructure.Services
 {
@@ -16,15 +17,18 @@ namespace Infrastructure.Services
         private readonly IBaseRepository<Product> _productsRepo;
         private readonly IBaseRepository<ProductOrigin> _productBrandRepo;
         private readonly IBaseRepository<ProductType> _productTypeRepo;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ProductService(IBaseRepository<Product> productsRepo,
             IBaseRepository<ProductOrigin> productBrandRepo,
-            IBaseRepository<ProductType> productTypeRepo)
+            IBaseRepository<ProductType> productTypeRepo, IUnitOfWork unitOfWork)
         {
             _productsRepo = productsRepo;
             _productBrandRepo = productBrandRepo;
             _productTypeRepo = productTypeRepo;
+            _unitOfWork = unitOfWork;
         }
+
         public async Task<IReadOnlyList<Product>> GetProductsAsync(ProductSpecParams productParams)
         {
             var productSpec = new ProductsWithTypesAndOriginsSpecification(productParams);
@@ -75,9 +79,19 @@ namespace Infrastructure.Services
             return await _productTypeRepo.GetListAsync();
         }
 
-        public async Task<ProductType> AddProductTypeAsync(ProductType productType)
+        public async Task<Result<ProductType>> AddProductTypeAsync(ProductType productType)
         {
-            throw new NotImplementedException();
+            var type = await _unitOfWork.Repository<ProductType>()
+                .GetEntityWithSpec(new ProductTypeByNameSpecification(productType.Name));
+
+            if (type != null)
+                return Result.Fail($"""Product Type: '{productType.Name.ToLower()} ' exists already.""");
+
+            _unitOfWork.Repository<ProductType>().Add(productType);
+            throw new ArgumentException($"""Error while saving product type: '{productType.Name.ToLower()} '.""");
+            await _unitOfWork.Complete();
+
+            return Result.Ok(productType);
         }
     }
 }

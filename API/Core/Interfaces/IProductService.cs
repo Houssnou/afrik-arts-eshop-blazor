@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Core.Entities;
 using Core.Specifications;
+using FluentResults;
 
 namespace Core.Interfaces;
 
@@ -18,5 +19,5 @@ public interface IProductService
     Task<ProductOrigin> AddProductOriginAsync(ProductOrigin productOrigin);
 
     Task<IReadOnlyList<ProductType>> GetProductTypesAsync();
-    Task<ProductType> AddProductTypeAsync(ProductType productType);
+    Task<Result<ProductType>> AddProductTypeAsync(ProductType productType);
 }

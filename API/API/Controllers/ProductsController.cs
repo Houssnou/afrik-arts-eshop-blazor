@@ -12,6 +12,8 @@ using AutoMapper;
 using API.Errors;
 using Microsoft.AspNetCore.Http;
 using API.Helpers;
+using System.Net;
+using FluentResults;
 
 namespace API.Controllers
 {
@@ -67,9 +69,35 @@ namespace API.Controllers
         }
 
         [HttpPost("types")]
+        [ProducesResponseType(typeof(BaseResponse<TypeForReturnDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<TypeForReturnDto>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ApiException), (int)HttpStatusCode.InternalServerError)]
+        [Produces("application/json")]
         public async Task<ActionResult<TypeForReturnDto>> AddNewType(TypeDto typeDto)
         {
-            return Ok();
+            var productType = _mapper.Map<ProductType>(typeDto);
+
+            var result = await _productService.AddProductTypeAsync(productType);
+
+            if (result.IsFailed )
+            {
+                return BadRequest(new BaseResponse<TypeForReturnDto>
+                {
+                    Success = result.IsSuccess,
+                    Errors = new List<string>
+                    {
+                        result.Errors[0].Message
+
+                    }
+                });
+            }
+
+            return Ok(new BaseResponse<TypeForReturnDto>
+            {
+                Success = result.IsSuccess,
+                Data = _mapper.Map<TypeForReturnDto>(result.Value)
+
+            });
         }
         [HttpPost("origins")]
         public async Task<ActionResult<OriginForReturnDto>> AddNewOrigin(OriginDto originDto)
