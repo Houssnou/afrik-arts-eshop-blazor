@@ -48,9 +48,25 @@ namespace API.Dtos
         public string Description { get; set; }
         [Required]
         public decimal Price { get; set; }
-        [Required]
+        public string PictureUrl { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Please provide a valid product type Id.")]
         public int Type { get; set; }
-        [Required]
-        public int ProductOrigin { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Please provide a valid product origin Id.")]
+        public int Origin { get; set; }
+
+        public ProductDto()
+        {
+        }
+
+        public ProductDto(int id, string name, string description, decimal price, string pictureUrl, int type, int origin)
+        {
+            Id = id;
+            Name = name;
+            Description = description;
+            Price = price;
+            PictureUrl = pictureUrl;
+            Type = type;
+            Origin = origin;
+        }
     }
 }

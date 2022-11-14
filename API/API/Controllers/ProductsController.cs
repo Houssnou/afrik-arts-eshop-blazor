@@ -136,10 +136,10 @@ namespace API.Controllers
         }
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponse<ProductToReturnDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse<ProductToReturnDto>), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(BaseResponse<ProductToReturnDto>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
         [Produces("application/json")]
-        public async Task<ActionResult<ProductToReturnDto>> AddNewProduct()
+        public async Task<ActionResult<ProductToReturnDto>> AddNewProduct(ProductDto productDto)
         {
             return Ok();
         }

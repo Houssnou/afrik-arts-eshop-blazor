@@ -11,7 +11,8 @@ public interface IProductService
     Task<IReadOnlyList<Product>> GetProductsAsync(ProductSpecParams productParams);
     Task<int> CountProductsAsync(ProductSpecParams productParams);
     Task<Product> GetProductAsyncById(int id);
-    Task<Product> AddProductAsync(Product product);
+
+    Task<Result<Product>> AddProductAsync(string name, string description, decimal price, string pictureUrl, int type, int origin);
     Task<Product> UpdateProductAsync(int id, Product product);
     Task DeleteProductAsync(int id);
     Task<IReadOnlyList<ProductOrigin>> GetProductOriginsAsync();

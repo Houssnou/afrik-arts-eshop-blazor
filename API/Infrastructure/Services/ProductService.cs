@@ -49,9 +49,33 @@ namespace Infrastructure.Services
             return await _productsRepo.GetEntityWithSpec(spec);
         }
 
-        public async Task<Product> AddProductAsync(Product product)
+        public async Task<Result<Product>> AddProductAsync(string name, string description, decimal price, string pictureUrl, int typeId, int originId)
         {
-            throw new NotImplementedException();
+            var type = await _unitOfWork.Repository<ProductType>().GetByIdAsync(typeId);
+
+            if (type == null) return Result.Fail($"""Invalid product type id: '{typeId} '""");
+
+            var origin = await _unitOfWork.Repository<ProductOrigin>().GetByIdAsync(typeId);
+
+            if (origin == null) return Result.Fail($"""Invalid product origin id: '{originId}'""");
+
+            var product = new Product
+            {
+                Name = name,
+                Description = description,
+                Price = price,
+                PictureUrl = pictureUrl,
+                ProductTypeId = typeId,
+                ProductType = type,
+                ProductOriginId = originId,
+                ProductOrigin = origin
+            };
+
+            _unitOfWork.Repository<Product>().Add(product);
+
+            await _unitOfWork.Complete();
+
+            return Result.Ok(product);
         }
 
         public async Task<Product> UpdateProductAsync(int id, Product product)
@@ -98,7 +122,7 @@ namespace Infrastructure.Services
                 return Result.Fail($"""Product Type: '{productType.Name.ToLower()} ' exists already.""");
 
             _unitOfWork.Repository<ProductType>().Add(productType);
-          
+
             await _unitOfWork.Complete();
 
             return Result.Ok(productType);

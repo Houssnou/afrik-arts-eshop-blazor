@@ -32,9 +32,11 @@ namespace API.Extensions
                    .SelectMany(x => x.Value.Errors)
                    .Select(x => x.ErrorMessage).ToArray();
 
-                   var errorResponse = new ApiValidationErrorResponse
+                   var errorResponse = new BaseResponse<string>()
                    {
-                       Errors = errors
+                       Success = false,
+                       Errors = errors.ToList(),
+                       Data = null
                    };
                    return new BadRequestObjectResult(errorResponse);
                };

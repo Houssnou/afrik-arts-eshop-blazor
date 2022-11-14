@@ -10,5 +10,8 @@ namespace Core.Entities
         public int ProductTypeId { get; set; }
         public ProductOrigin ProductOrigin { get; set; }
         public int ProductOriginId { get; set; }
+
+        public Product()
+        { }
     }
 }
