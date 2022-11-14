@@ -14,10 +14,8 @@ public interface IProductService
     Task<Product> AddProductAsync(Product product);
     Task<Product> UpdateProductAsync(int id, Product product);
     Task DeleteProductAsync(int id);
-
     Task<IReadOnlyList<ProductOrigin>> GetProductOriginsAsync();
-    Task<ProductOrigin> AddProductOriginAsync(ProductOrigin productOrigin);
-
+    Task<Result<ProductOrigin>> AddProductOriginAsync(ProductOrigin productOrigin);
     Task<IReadOnlyList<ProductType>> GetProductTypesAsync();
     Task<Result<ProductType>> AddProductTypeAsync(ProductType productType);
 }

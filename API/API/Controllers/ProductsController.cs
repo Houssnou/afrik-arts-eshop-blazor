@@ -57,21 +57,29 @@ namespace API.Controllers
         }
         [Cached(600)]
         [HttpGet("origins")]
-        public async Task<ActionResult<List<ProductOrigin>>> GetOrigins()
+        [ProducesResponseType(typeof(BaseResponse<OriginForReturnDto>), (int)HttpStatusCode.OK)]
+        [Produces("application/json")]
+        public async Task<ActionResult<BaseResponse<List<OriginForReturnDto>>>> GetOrigins()
         {
-            return Ok(_mapper.Map<IReadOnlyList<OriginForReturnDto>>(await _productService.GetProductOriginsAsync()));
+            var result = await _productService.GetProductOriginsAsync();
+
+            return Ok(new BaseResponse<List<OriginForReturnDto>> { Success = true, Data = _mapper.Map<List<OriginForReturnDto>>(result) });
         }
         [Cached(600)]
         [HttpGet("types")]
-        public async Task<ActionResult<List<ProductType>>> GetTypes()
+        [ProducesResponseType(typeof(BaseResponse<TypeForReturnDto>), (int)HttpStatusCode.OK)]
+        [Produces("application/json")]
+        public async Task<ActionResult<BaseResponse<List<TypeForReturnDto>>>> GetTypes()
         {
-            return Ok(_mapper.Map<IReadOnlyList<TypeForReturnDto>>(await _productService.GetProductTypesAsync()));
+            var result = await _productService.GetProductTypesAsync();
+
+            return Ok(new BaseResponse<List<TypeForReturnDto>> { Success = true, Data = _mapper.Map<List<TypeForReturnDto>>(result) });
         }
 
         [HttpPost("types")]
         [ProducesResponseType(typeof(BaseResponse<TypeForReturnDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BaseResponse<TypeForReturnDto>), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ApiException), (int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
         [Produces("application/json")]
         public async Task<ActionResult<TypeForReturnDto>> AddNewType(TypeDto typeDto)
         {
@@ -79,7 +87,7 @@ namespace API.Controllers
 
             var result = await _productService.AddProductTypeAsync(productType);
 
-            if (result.IsFailed )
+            if (result.IsFailed)
             {
                 return BadRequest(new BaseResponse<TypeForReturnDto>
                 {
@@ -87,7 +95,6 @@ namespace API.Controllers
                     Errors = new List<string>
                     {
                         result.Errors[0].Message
-
                     }
                 });
             }
@@ -96,15 +103,42 @@ namespace API.Controllers
             {
                 Success = result.IsSuccess,
                 Data = _mapper.Map<TypeForReturnDto>(result.Value)
-
             });
         }
         [HttpPost("origins")]
+        [ProducesResponseType(typeof(BaseResponse<OriginForReturnDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<OriginForReturnDto>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        [Produces("application/json")]
         public async Task<ActionResult<OriginForReturnDto>> AddNewOrigin(OriginDto originDto)
         {
-            return Ok();
+            var productOrigin = _mapper.Map<ProductOrigin>(originDto);
+
+            var result = await _productService.AddProductOriginAsync(productOrigin);
+
+            if (result.IsFailed)
+            {
+                return BadRequest(new BaseResponse<OriginForReturnDto>
+                {
+                    Success = result.IsSuccess,
+                    Errors = new List<string>
+                    {
+                        result.Errors[0].Message
+                    }
+                });
+            }
+
+            return Ok(new BaseResponse<OriginForReturnDto>
+            {
+                Success = result.IsSuccess,
+                Data = _mapper.Map<OriginForReturnDto>(result.Value)
+            });
         }
         [HttpPost]
+        [ProducesResponseType(typeof(BaseResponse<ProductToReturnDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<ProductToReturnDto>), (int)HttpStatusCode.InternalServerError)]
+        [Produces("application/json")]
         public async Task<ActionResult<ProductToReturnDto>> AddNewProduct()
         {
             return Ok();
@@ -117,6 +151,10 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(BaseResponse<string>), (int)HttpStatusCode.InternalServerError)]
+        [Produces("application/json")]
         public async Task<ActionResult> DeleteProduct(int id)
         {
             return Ok();

@@ -69,9 +69,19 @@ namespace Infrastructure.Services
             return await _productBrandRepo.GetListAsync();
         }
 
-        public async Task<ProductOrigin> AddProductOriginAsync(ProductOrigin productOrigin)
+        public async Task<Result<ProductOrigin>> AddProductOriginAsync(ProductOrigin productOrigin)
         {
-            throw new NotImplementedException();
+            var type = await _unitOfWork.Repository<ProductOrigin>()
+               .GetEntityWithSpec(new ProductOriginByNameSpecification(productOrigin.Name));
+
+            if (type != null)
+                return Result.Fail($"""Product Origin: '{productOrigin.Name.ToLower()} ' exists already.""");
+
+            _unitOfWork.Repository<ProductOrigin>().Add(productOrigin);
+
+            await _unitOfWork.Complete();
+
+            return Result.Ok(productOrigin);
         }
 
         public async Task<IReadOnlyList<ProductType>> GetProductTypesAsync()
@@ -88,7 +98,7 @@ namespace Infrastructure.Services
                 return Result.Fail($"""Product Type: '{productType.Name.ToLower()} ' exists already.""");
 
             _unitOfWork.Repository<ProductType>().Add(productType);
-            throw new ArgumentException($"""Error while saving product type: '{productType.Name.ToLower()} '.""");
+          
             await _unitOfWork.Complete();
 
             return Result.Ok(productType);

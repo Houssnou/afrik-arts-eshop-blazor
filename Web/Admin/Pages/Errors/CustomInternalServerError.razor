@@ -1,0 +1,12 @@
+﻿@page "/500"
+
+<div class="container">
+    @foreach (var e in Errors)
+    {
+        <div class="alert alert-danger">@e</div>
+    }
+</div>
+
+@code {
+    public List<string> Errors { get; set; }
+}

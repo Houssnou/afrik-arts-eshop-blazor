@@ -22,3 +22,11 @@ window.ShowSwal = (title, type, msg) => {
         type
     )
 }
+
+function ShowDeleteConfirmationModal() {
+    $("#confirmation-modal").modal('show');
+}
+
+function HideDeleteConfirmationModal() {
+    $("#confirmation-modal").modal('hide');
+}

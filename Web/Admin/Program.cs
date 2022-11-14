@@ -4,6 +4,7 @@ using Admin.Data;
 using Admin.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +13,15 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-builder.Services.AddHttpClient<ApiService>(client =>
+builder.Services.AddHttpClient<ApiService>((sp, client) =>
 {
     client.BaseAddress = new Uri("https://localhost:5001/api/");
     client.DefaultRequestHeaders.Accept.Add(
         new MediaTypeWithQualityHeaderValue("application/json"));
+    //client.EnableIntercept(sp);
 });
+
+//builder.Services.AddHttpClientInterceptor();
 
 var app = builder.Build();
 

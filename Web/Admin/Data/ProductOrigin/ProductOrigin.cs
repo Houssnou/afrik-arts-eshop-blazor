@@ -1,16 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Admin.Data.ProductType;
+namespace Admin.Data.ProductOrigin;
 
-public class ProductType
+public class ProductOrigin
 {
     public int Id { get; set; }
     [Required]
     public string Name { get; set; }
 
-    public ProductType()
+    public ProductOrigin()
     { }
-    public ProductType(int id, string name)
+    public ProductOrigin(int id, string name)
     {
         Id = id;
         Name = name;

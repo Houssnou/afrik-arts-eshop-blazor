@@ -1,20 +1,21 @@
-﻿@page "/product-types"
+﻿@page "/product-origins"
 @using Admin.Services
+@using Admin.Data.ProductOrigin
 @inject ApiService _ApiService
 @inject IJSRuntime _JsRuntime
 
 <_DeleteConfirmation ConfirmationChanged="DeleteConfirmation"></_DeleteConfirmation>
-<h3>Product Types</h3>
+<h3>Product Origins</h3>
 
 <div class="container ms-0">
 
-    <a href="product-types/create" class="btn btn-outline-primary float-end">New Type</a>
+    <a href="product-origins/create" class="btn btn-outline-primary float-end">New Origin</a>
 
-    @if (types == null)
+    @if (origins == null)
     {
         <p><em>Loading...</em></p>
     }
-    else if (!types.Any())
+    else if (!origins.Any())
     {
         <p><em>No records...</em></p>
     }
@@ -29,13 +30,13 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var pt in types)
+                @foreach (var pt in origins)
                 {
                     <tr>
                         <td>@pt.Id</td>
                         <td>@pt.Name</td>
                         <td>
-                            <a href="product-types/edit/@pt.Id/@pt.Name" class="btn btn-outline-warning"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <a href="product-origins/edit/@pt.Id/@pt.Name" class="btn btn-outline-warning"><i class="fa-solid fa-pen-to-square"></i></a>
                             <button class="btn btn-outline-danger" @onclick="()=>DeleteHandler(pt.Id)"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
@@ -48,13 +49,13 @@
 @code {
     private int IdToDelete { get; set; }
 
-    private IList<ProductType>? types;
+    private IList<ProductOrigin>? origins;
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await _ApiService.GetAllProductTypes();
+        var response = await _ApiService.GetAllProductOrgins();
 
-        if (response.IsSuccess) types = response.Value;
+        if (response.IsSuccess) origins = response.Value;
     }
 
     private void DeleteHandler(int id)
@@ -67,7 +68,7 @@
     {
         if (isConfirmed && IdToDelete != 0)
         {
-            var response = await _ApiService.DeleteProductType(IdToDelete);
+            var response = await _ApiService.DeleteProductOrigin(IdToDelete);
 
             if (!response.IsSuccess)
             {
@@ -76,9 +77,9 @@
             }
             else
             {
-                var deleted = types.Single(t => t.Id == IdToDelete);
+                var deleted = origins.Single(t => t.Id == IdToDelete);
 
-                types.Remove(deleted);
+                origins.Remove(deleted);
                 _JsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
             }
         }

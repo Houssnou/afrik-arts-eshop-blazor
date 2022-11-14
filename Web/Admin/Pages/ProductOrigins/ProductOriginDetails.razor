@@ -1,27 +1,25 @@
-﻿@page "/product-origins/create"
-@page "/product-origins/edit/{Id:int}/{Name}"
-@using Microsoft.AspNetCore.Components
-@using Admin.Data.ProductOrigin
+﻿@page "/product-types/create"
+@page "/product-types/edit/{Id:int}/{Name}"
 
 @inject NavigationManager _NavigationManager
 @inject IJSRuntime _JsRuntime
 @inject ApiService _ApiService
 
 <div class="row my-2">
-    <h3 class="card-title text-primary mb-3 ml-3">@Title Product Origin</h3>
+    <h3 class="card-title text-primary mb-3 ml-3">@Title Product Type</h3>
     <div class="col-4">
-        <EditForm Model="productOrigin" OnValidSubmit="SaveChanges">
+        <EditForm Model="productType" OnValidSubmit="SaveChanges">
             <DataAnnotationsValidator />
             @*<ValidationSummary />*@
             <div class="mb-3">
-                <label for="name" class="form-label">Origin Name</label>
-                <InputText @bind-Value="productOrigin.Name" class="form-control"></InputText>
-                <ValidationMessage For="()=>productOrigin.Name"></ValidationMessage>
+                <label for="name" class="form-label">Type Name</label>
+                <InputText @bind-Value="productType.Name" class="form-control"></InputText>
+                <ValidationMessage For="()=>productType.Name"></ValidationMessage>
             </div>
 
             <div class="d-grid gap-2 d-md-block float-end">
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <NavLink href="product-origins" class="btn btn-danger">Cancel</NavLink>
+                <NavLink href="product-types" class="btn btn-danger">Cancel</NavLink>
             </div>
         </EditForm>
     </div>
@@ -35,13 +33,13 @@
     [Parameter]
     public string Name { get; set; }
 
-    private ProductOrigin productOrigin { get; set; } = new ProductOrigin();
+    private ProductType productType { get; set; } = new ProductType();
 
     public string Title { get; set; } = "New";
 
     private async Task SaveChanges()
     {
-        var response = await _ApiService.CreateNewProductOrigin(productOrigin);
+        var response = await _ApiService.CreateNewProductType(productType);
 
         if (!response.IsSuccess)
         {
@@ -50,8 +48,8 @@
         }
         else
         {
-            await _JsRuntime.ToastrSuccess($"{productOrigin.Name} successfully saved!");
-            _NavigationManager.NavigateTo("/product-origins");
+            await _JsRuntime.ToastrSuccess($"{productType.Name} successfully saved!");
+            _NavigationManager.NavigateTo("/product-types");
         }
     }
 
@@ -60,7 +58,7 @@
         if (Id != 0 || !string.IsNullOrEmpty(Name))
         {
             Title = "Update";
-            productOrigin = new ProductOrigin(Id, Name);
+            productType = new ProductType(Id, Name);
         }
     }
 

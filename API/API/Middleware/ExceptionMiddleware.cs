@@ -53,7 +53,7 @@ namespace API.Middleware
                         Data = null,
                         Errors = new List<string>()
                         {
-                            $"Oops! Something went wrong. please report this unexpected response using this code: { Activity.Current?.Id ?? context.TraceIdentifier}"
+                            $"Something went wrong. Please report this unexpected response using this code: { Activity.Current?.Id ?? context.TraceIdentifier}"
                         }
                     };
                 var options = new JsonSerializerOptions
