@@ -3,6 +3,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using Admin.Data.ApiResponse;
+using Admin.Data.Product;
 using Admin.Data.ProductOrigin;
 using Admin.Data.ProductType;
 using FluentResults;
@@ -111,5 +112,84 @@ public class ApiService
             return Result.Fail(eResponse.Errors);
         }
         return Result.Ok();
+    }
+
+    public async Task<Result<List<ProductForList>>> GetAllProducts()
+    {
+        var response = await _httpClient.GetAsync("products/all");
+        response.EnsureSuccessStatusCode();
+
+        await using var responseContent = await response.Content.ReadAsStreamAsync();
+        var result = await JsonSerializer.DeserializeAsync<BaseResponse<List<ProductForList>>>(responseContent, _options);
+
+        return !result.Success ? Result.Fail(result.Errors) : Result.Ok(result.Data);
+    }
+    public async Task<Result> DeleteProduct(int id)
+    {
+        using var httpResponseMessage =
+            await _httpClient.DeleteAsync($"products/{id}");
+
+        var responseContent = await httpResponseMessage.Content.ReadAsStreamAsync(); ;
+
+        if (!httpResponseMessage.IsSuccessStatusCode)
+        {
+            var eResponse = await JsonSerializer.DeserializeAsync<BaseResponse<string>>(responseContent, _options);
+            return Result.Fail(eResponse.Errors);
+        }
+        return Result.Ok();
+    }
+
+    public async Task<Result<Product>> CreateNewProduct(ProductForCreation product)
+    {
+        var body = new StringContent(JsonSerializer.Serialize(product), Encoding.UTF8, MediaTypeNames.Application.Json);
+
+        using var httpResponseMessage =
+            await _httpClient.PostAsync("products", body);
+
+        var responseContent = await httpResponseMessage.Content.ReadAsStreamAsync(); ;
+
+        if (!httpResponseMessage.IsSuccessStatusCode)
+        {
+            var eResponse = await JsonSerializer.DeserializeAsync<BaseResponse<string>>(responseContent, _options);
+            return Result.Fail(eResponse.Errors);
+        }
+
+        var sResponse = await JsonSerializer.DeserializeAsync<BaseResponse<Product>>(responseContent, _options);
+        return Result.Ok(sResponse.Data);
+    }
+
+    public async Task<Result<Product>> GetProductDetails(int productId)
+    {
+        using var httpResponseMessage =
+            await _httpClient.GetAsync($"products/{productId}");
+
+        var responseContent = await httpResponseMessage.Content.ReadAsStreamAsync(); ;
+
+        if (!httpResponseMessage.IsSuccessStatusCode)
+        {
+            var eResponse = await JsonSerializer.DeserializeAsync<BaseResponse<string>>(responseContent, _options);
+            return Result.Fail(eResponse.Errors);
+        }
+
+        var sResponse = await JsonSerializer.DeserializeAsync<BaseResponse<Product>>(responseContent, _options);
+        return Result.Ok(sResponse.Data);
+    }
+    public async Task<Result<Product>> UpdateProductAsync(int id, ProductForCreation product)
+    {
+        var body = new StringContent(JsonSerializer.Serialize(product), Encoding.UTF8, MediaTypeNames.Application.Json);
+
+        using var httpResponseMessage =
+            await _httpClient.PutAsync($"products/{id}", body);
+
+        var responseContent = await httpResponseMessage.Content.ReadAsStreamAsync(); ;
+
+        if (!httpResponseMessage.IsSuccessStatusCode)
+        {
+            var eResponse = await JsonSerializer.DeserializeAsync<BaseResponse<string>>(responseContent, _options);
+            return Result.Fail(eResponse.Errors);
+        }
+
+        var sResponse = await JsonSerializer.DeserializeAsync<BaseResponse<Product>>(responseContent, _options);
+        return Result.Ok(sResponse.Data);
     }
 }

@@ -1,0 +1,87 @@
+﻿@page "/products"
+@using Admin.Data.ApiResponse
+@inject ApiService _ApiService
+@inject IJSRuntime _JsRuntime
+
+<h3>Products</h3>
+<_DeleteConfirmation ConfirmationChanged="DeleteConfirmation"></_DeleteConfirmation>
+
+<div class="container ms-0">
+    <a href="products/create" class="btn btn-outline-primary float-end">New Product</a>
+    <br />
+    @if (products == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else if (!products.Any())
+    {
+        <p><em>No records...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pt in products)
+                {
+                    <tr>
+                        <td>@pt.Id</td>
+                        <td>@pt.Name</td>
+                        <td>
+                            <a href="products/edit/@pt.Id" class="btn btn-outline-warning"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <button class="btn btn-outline-danger" @onclick="()=>DeleteHandler(pt.Id)"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+@code {
+
+
+    private List<ProductForList> products = new List<ProductForList>();
+    public int IdToDelete { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _ApiService.GetAllProducts();
+
+        if (result.IsSuccess)
+        {
+            products = result.Value;
+        };
+    }
+
+    private void DeleteHandler(int id)
+    {
+        IdToDelete = id;
+        _JsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
+    }
+
+    private async Task DeleteConfirmation(bool isConfirmed)
+    {
+        if (isConfirmed && IdToDelete != 0)
+        {
+            var response = await _ApiService.DeleteProduct(IdToDelete);
+
+            if (!response.IsSuccess)
+            {
+                var msg = String.Join(",", response.Errors.Select(e => e.Message));
+                await _JsRuntime.InvokeVoidAsync("ShowSwal", "Oups!", "error", msg);
+            }
+            else
+            {
+                var deleted = products.Single(t => t.Id == IdToDelete);
+
+                products.Remove(deleted);
+                _JsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
+            }
+        }
+    }
+}

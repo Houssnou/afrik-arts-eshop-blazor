@@ -1,0 +1,83 @@
+﻿@*@*@*@*@page "/products-grid"
+@using Admin.Services;
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Admin.Data.ApiResponse
+@inject ApiService _ApiService
+
+<h3>Products</h3>
+
+<div class="container ms-0">
+    <a href="products/create" class="btn btn-outline-primary float-end">New Product</a>
+    <br />
+    @if (products == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else if (!products.Any())
+    {
+        <p><em>No records...</em></p>
+    }
+    else
+    {
+
+        <div class="page-size-chooser">
+            Items per page:
+            <select @bind="@pagination.ItemsPerPage">
+                <option>5</option>
+                <option>10</option>
+                <option>20</option>
+            </select>
+        </div>
+        <div class="search-box inline-block mr-4 my-1">
+            Search: <input type="search" autofocus @bind:event="oninput" placeholder="Product name..." />
+        </div>
+        <div class="grid">
+            <QuickGrid Items="@filteredProducts" Pagination="@pagination">
+                <PropertyColumn Property="@(p => p.Id)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.Name)" Sortable="true" />
+                <PropertyColumn Title="Type" Property="@(p => p.ProductType)" Sortable="true" />
+                <PropertyColumn Title="Origin" Property="@(p => p.ProductOrigin)" Sortable="true" />
+            </QuickGrid>
+        </div>
+        <Paginator Value="@pagination" />
+    }
+</div>
+@code {
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    //private List<ProductForList> products = new List<ProductForList>();
+    IQueryable<ProductForList>? products;
+    string nameSearch;
+
+    IQueryable<ProductForList> filteredProducts
+    {
+        get
+        {
+            var result = products;
+
+            if (!string.IsNullOrEmpty(nameSearch))
+            {
+                result = result.Where(c => c.Name.Contains(nameSearch, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            //add search options
+            return result;
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _ApiService.GetAllProducts();
+
+        if (result.IsSuccess)
+        {
+            products = result.Value.AsQueryable();
+        };
+    }
+
+    private void DeleteHandler(int ptId)
+    {
+        throw new NotImplementedException();
+    }
+
+}
+*@*@*@*@

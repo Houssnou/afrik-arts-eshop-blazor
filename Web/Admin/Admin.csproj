@@ -7,15 +7,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Pages\Products\Products - Copy.razor.css" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Folder Include="Data\ProductOrigin\" />
 		<Folder Include="Data\ProductType\" />
 		<Folder Include="Helpers\" />
-		<Folder Include="Pages\Products\" />
+		<Folder Include="wwwroot\images\products\" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="FluentResults" Version="3.15.0" />
 	  <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="0.1.0-alpha.22351.1" />
+	  <PackageReference Include="Syncfusion.Blazor.RichTextEditor" Version="20.3.0.57" />
+	  <PackageReference Include="Syncfusion.Blazor.Themes" Version="20.3.0.57" />
 	  <PackageReference Include="Toolbelt.Blazor.HttpClientInterceptor" Version="10.2.0" />
 	</ItemGroup>
 

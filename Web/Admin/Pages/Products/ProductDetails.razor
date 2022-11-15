@@ -1,0 +1,178 @@
+﻿@page "/products/create"
+@page "/products/edit/{Id:int}"
+@using Admin.Services
+@using Admin.Data.Product
+@using Admin.Data.ProductOrigin
+@using Admin.Pages.ProductOrigins
+@using Admin.Services.Interfaces
+@inject ApiService _ApiService
+@inject IJSRuntime _JsRuntime
+@inject NavigationManager _NavigationManager
+@inject IFileUploadService _FileUploadService
+
+<h3 class="card-title text-primary mb-3 ml-3">@Title Product </h3>
+<div class="row ms-0">
+    <div class="col-4">
+        <EditForm Model="product" OnValidSubmit="SaveChanges">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <InputText @bind-Value="product.Name" class="form-control"></InputText>
+                <ValidationMessage For="()=>product.Name"></ValidationMessage>
+            </div>
+         @*   <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <InputTextArea @bind-Value="product.Description" class="form-control"></InputTextArea>
+                <ValidationMessage For="()=>product.Description"></ValidationMessage>
+            </div>*@
+            
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <SfRichTextEditor @bind-Value="product.Description"></SfRichTextEditor>
+                <ValidationMessage For="()=>product.Description"></ValidationMessage>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                @*  <InputText @bind-Value="product.Price" class="form-control"></InputText>*@
+                <input type="number" @bind-value="@product.Price" @bind-value:event="oninput" class="form-control" />
+                <ValidationMessage For="()=>product.Price"></ValidationMessage>
+            </div>
+            <div class="mb-3">
+                <InputSelect @bind-Value="product.Type" class="form-select">
+                    <option value="0" disabled="disabled" selected>--Select type--</option>
+                    @foreach (var productType in types)
+                    {
+                        <option value="@productType.Id">@productType.Name</option>
+                    }
+
+                </InputSelect>
+                <ValidationMessage For="()=>product.Type"></ValidationMessage>
+            </div>
+            <div class="mb-3">
+                <InputSelect @bind-Value="product.Origin" class="form-select">
+                    <option value="0" disabled="disabled" selected>--Select origin--</option>
+                    @foreach (var productOrigin in origins)
+                    {
+                        <option value="@productOrigin.Id">@productOrigin.Name</option>
+                    }
+
+                </InputSelect>
+                <ValidationMessage For="()=>product.Origin"></ValidationMessage>
+            </div>
+
+            <div class="d-grid gap-2 d-md-block float-end">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <NavLink href="product-origins" class="btn btn-danger">Cancel</NavLink>
+            </div>
+        </EditForm>
+    </div>
+    <div class="col-4 start-end">
+        <img src="https://via.placeholder.com/200x200.jpg" class="img-thumbnail mb-2" alt="image placeholder">
+        <br />
+        <InputFile OnChange="ImageUplaodHandler"></InputFile>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ProductForCreation product { get; set; } = new ProductForCreation();
+    private List<ProductType> types { get; set; } = new List<ProductType>();
+    private List<ProductOrigin> origins { get; set; } = new List<ProductOrigin>();
+
+    public string Title { get; set; } = "New";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReferenceTableData();
+
+        if (Id != 0)
+        {
+            //edit
+            Title = "Update";
+            var result = await _ApiService.GetProductDetails(Id);
+
+            if (!result.IsSuccess)
+            {
+                var msg = String.Join(",", result.Errors.Select(e => e.Message));
+                await _JsRuntime.InvokeVoidAsync("ShowSwal", "Oups!", "error", msg);
+            }
+            else
+            {
+                var data = result.Value;
+                product = new ProductForCreation()
+                    {
+                        Id = data.Id,
+                        Name = data.Name,
+                        Description = data.Description,
+                        Price = data.Price,
+                        Origin = origins.SingleOrDefault(o => o.Name == data.ProductOrigin)!.Id,
+                        Type = types.SingleOrDefault(o => o.Name == data.ProductType)!.Id,
+                        PictureUrl = data.PictureUrl
+                    };
+            }
+        }
+        else
+        {
+            //new
+            Title = "New";
+            product = new ProductForCreation();
+        }
+    }
+
+    private async Task LoadReferenceTableData()
+    {
+        var typesResponse = await _ApiService.GetAllProductTypes();
+        if (typesResponse.IsSuccess) types = typesResponse.Value;
+
+        var originsResponse = await _ApiService.GetAllProductOrgins();
+        if (originsResponse.IsSuccess) origins = originsResponse.Value;
+    }
+
+    private async Task ImageUplaodHandler(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+
+            var fileInfo = new System.IO.FileInfo(file.Name);
+            if (fileInfo.Extension.ToLower() == ".jpg" ||
+                fileInfo.Extension.ToLower() == ".png" ||
+                fileInfo.Extension.ToLower() == ".jpeg")
+            {
+                product.PictureUrl = await _FileUploadService.UploadFile(file);
+            }
+            else
+            {
+                await _JsRuntime.InvokeVoidAsync("ShowSwal", "Oups!", "error", "Authorized file format(s): .jpg/.jpeg/.png");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            await _JsRuntime.InvokeVoidAsync("ShowSwal", "Oups!", "error", ex.Message);
+        }
+    }
+
+    private async Task SaveChanges()
+    {
+        var response = Id == 0
+                                    ? await _ApiService.CreateNewProduct(product)
+                                    : await _ApiService.UpdateProductAsync(product.Id, product);
+
+        if (!response.IsSuccess)
+        {
+            var msg = String.Join(",", response.Errors.Select(e => e.Message));
+            await _JsRuntime.InvokeVoidAsync("ShowSwal", "Oups!", "error", msg);
+        }
+        else
+        {
+            var action = Id == 0 ? "successfully" : "updated";
+            await _JsRuntime.ToastrSuccess($"{product.Name} {action} saved!");
+            _NavigationManager.NavigateTo("/products");
+        }
+    }
+
+
+}

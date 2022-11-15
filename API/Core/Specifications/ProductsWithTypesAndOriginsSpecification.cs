@@ -42,6 +42,12 @@ namespace Core.Specifications
             AddInclude(p => p.ProductOrigin);
             AddInclude(p => p.ProductType);
         }
+
+        public ProductsWithTypesAndOriginsSpecification() : base()
+        {
+            AddInclude(p => p.ProductOrigin);
+            AddInclude(p => p.ProductType);
+        }
     }
 
 

@@ -2,8 +2,10 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using Admin.Data;
 using Admin.Services;
+using Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Syncfusion.Blazor;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddSyncfusionBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 builder.Services.AddHttpClient<ApiService>((sp, client) =>
 {
@@ -24,6 +28,8 @@ builder.Services.AddHttpClient<ApiService>((sp, client) =>
 //builder.Services.AddHttpClientInterceptor();
 
 var app = builder.Build();
+//Register Syncfusion license
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(builder.Configuration["SyncfusionLicense"]);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

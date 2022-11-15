@@ -42,11 +42,13 @@ namespace Infrastructure.Services
             return await _productsRepo.CountAsync(countSpec);
         }
 
-        public async Task<Product> GetProductAsyncById(int id)
+        public async Task<Result<Product>> GetProductAsyncById(int id)
         {
             var spec = new ProductsWithTypesAndOriginsSpecification(id);
 
-            return await _productsRepo.GetEntityWithSpec(spec);
+            var product = await _productsRepo.GetEntityWithSpec(spec);
+
+            return product == null ? Result.Fail($"""Product id: '{id} ' not found.""") : Result.Ok(product);
         }
 
         public async Task<Result<Product>> AddProductAsync(string name, string description, decimal price, string pictureUrl, int typeId, int originId)
@@ -78,9 +80,34 @@ namespace Infrastructure.Services
             return Result.Ok(product);
         }
 
-        public async Task<Product> UpdateProductAsync(int id, Product product)
+        public async Task<Result<Product>> UpdateProductAsync(int id, string name, string description, decimal price, string pictureUrl, int pType, int pOrigin)
         {
-            throw new NotImplementedException();
+            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
+
+            if (product == null) return Result.Fail($"""Invalid product id: '{id}'""");
+
+            var type = await _unitOfWork.Repository<ProductType>().GetByIdAsync(pType);
+
+            if (type == null) return Result.Fail($"""Invalid product type id: '{pType} '""");
+
+            var origin = await _unitOfWork.Repository<ProductOrigin>().GetByIdAsync(pOrigin);
+
+            if (origin == null) return Result.Fail($"""Invalid product origin id: '{pOrigin}'""");
+
+            product.Name = name;
+            product.Description = description;
+            product.Price = price;
+            product.PictureUrl = pictureUrl;
+            product.ProductTypeId = type.Id;
+            product.ProductType = type;
+            product.ProductOriginId = origin.Id;
+            product.ProductOrigin = origin;
+
+            _unitOfWork.Repository<Product>().Update(product);
+
+            await _unitOfWork.Complete();
+
+            return Result.Ok(product);
         }
 
         public async Task DeleteProductAsync(int id)
@@ -126,6 +153,11 @@ namespace Infrastructure.Services
             await _unitOfWork.Complete();
 
             return Result.Ok(productType);
+        }
+
+        public async Task<IReadOnlyList<Product>> GetAllProductsAsync()
+        {
+            return await _productsRepo.ListAsync(new ProductsWithTypesAndOriginsSpecification());
         }
     }
 }
